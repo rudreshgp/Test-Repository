@@ -2,11 +2,13 @@
 	{
 		"Name" 	: "Rudresh",
 		"Age"	: 25,
-		"City"	: "Berlin"
+		"City"	: "Berlin",
+		"DOB"	: "04/04/1991"
 	},
 	{
 		"Name" 	: "Ramesh",
 		"Age"	: 25,
-		"City"	: "Bangalore"
+		"City"	: "Bangalore",
+		"DOB"	: "18/02/1990"
 	}
 ]
