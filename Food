@@ -1,0 +1,95 @@
+class CountryViewModel {
+	public _code : string;
+	public _name : string;
+	constructor (public code:string,public name){
+		this._code = code;
+		this._name = name;
+	}
+}
+
+class Country {
+	public _id : number ;
+	public _code : string;
+	public _name : string;
+	constructor (public id:number, public code:string,public name){
+		this._id = id;
+		this._code = code;
+		this._name = name;
+	}
+}
+interface ICountryInfo {
+	getAllCountries():CountryViewModel[];
+	saveCountries(_countries:CountryViewModel[]):void;
+}
+class CountryInfo implements ICountryInfo {
+	public _countryRepository : ICountryRepository;
+	constructor(){
+		this._countryRepository = new CountryRepository();
+	}
+	getAllCountries(): CountryViewModel[] {
+        let countriesData = this._countryRepository.getAllCountries();
+		let countries : CountryViewModel[] =[];
+		for (let country of countriesData) {
+			countries.push(new CountryViewModel(country._code,country._name));
+		}
+		return countries;
+    }
+	saveCountries(_countries:CountryViewModel[]):void {
+		let countriesData : Country[] = [];
+		let i : number = 0;
+		for (let country of _countries) {
+			countriesData.push(new Country(i++,country._code,country._name));
+		}
+		this._countryRepository.saveCountries(countriesData);
+	}
+}
+interface ICountryRepository {
+	getAllCountries():Country[];
+	saveCountries(_countries:Country[]):void;
+}
+class CountryRepository implements  ICountryRepository {
+	getAllCountries():Country[]{
+		console.log(JSON.parse(localStorage.getItem('Countries')));
+		return JSON.parse(localStorage.getItem('Countries'));
+	}
+	saveCountries(_countries:Country[]):void{
+		localStorage.setItem('Countries', JSON.stringify(_countries));
+	}
+}
+// countries.push(new CountryViewModel('A','AA'));
+// countries.push(new CountryViewModel('B','BB'));
+// countries.push(new CountryViewModel('C','CC'));
+// countries.push(new CountryViewModel('C','CC'));
+// countries.push(new CountryViewModel('D','DD'));
+// countries.push(new CountryViewModel('E','EE'));
+// countries.push(new CountryViewModel('F','FF'));
+// countries.push(new CountryViewModel('G','GG'));
+// countries.push(new CountryViewModel('H','HH'));
+let _contryInfo : ICountryInfo = new CountryInfo();
+
+function GetAllCountries() : void {
+    let countries : CountryViewModel[] =  _contryInfo.getAllCountries();
+	console.log(countries);
+}
+function ReadDataFromUrl():void {
+    let url = 'http://pastebin.com/raw/943PQQ0n';
+	let xmlHttp = new XMLHttpRequest();
+	let countries : CountryViewModel[] = [];
+	let responseData : string[] = []; 
+    xmlHttp.open( "GET", url, false );
+	xmlHttp.onreadystatechange = function() {
+		if (xmlHttp.status === 200) {  
+			responseData = xmlHttp.responseText.split("\n"); 
+			responseData = responseData.splice(3);
+			responseData=responseData.splice(0,responseData.length-1);
+			for(let country of responseData){
+				let countryData  = country.split("   "); 
+				if(countryData[0]!="") {
+					countries.push(new CountryViewModel(countryData[0],countryData[1]));
+				}
+		}
+		_contryInfo.saveCountries(countries);
+		}
+	  }
+	xmlHttp.send(null);
+}
